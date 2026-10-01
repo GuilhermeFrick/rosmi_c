@@ -119,6 +119,9 @@ No final, **o número de objetos é o número de chefes que sobraram**.
 
 ### 2.3 Paralelizar: rotular localmente, unir nas bordas
 
+> O diagrama [`docs/fluxo-processamento.excalidraw`](docs/fluxo-processamento.excalidraw)
+> percorre as três fases sobre esta mesma imagem de 8 × 4 pixels.
+
 A parte fácil é que cada segmento pode ser rotulado sozinho, sem falar com
 ninguém. A parte difícil é a reconciliação. E aqui está a ideia central do
 projeto:
@@ -220,6 +223,10 @@ imediatamente.
 ---
 
 ## 3. Arquitetura do código
+
+> O diagrama [`docs/arquitetura-modulos.excalidraw`](docs/arquitetura-modulos.excalidraw)
+> mostra este fluxo bloco a bloco, indicando o arquivo `.c` que implementa cada
+> etapa e o dado que atravessa cada seta.
 
 O código foi organizado em **três camadas**, com uma regra: cada camada só pode
 depender das que estão abaixo dela.
@@ -567,7 +574,7 @@ src/
   RosmiParMain.c         programa paralelo
 
 cafes/                   modelos CWM, ACPM e CDCM das tres segmentacoes
-docs/                    diagrama do fluxo de processamento (.excalidraw)
+docs/                    diagramas em .excalidraw: fluxo e arquitetura
 test/                    um arquivo de teste por módulo
 tools/                   geração de imagens, validação e relatórios
 data/                    imagens de teste com resposta conhecida
