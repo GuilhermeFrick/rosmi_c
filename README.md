@@ -295,17 +295,9 @@ há disputa e nenhuma seção crítica é necessária.
 
 **Por que a plataforma fica num arquivo separado.** `RosmiTask.c` contém a
 lógica portável — validar, alocar, repartir, coletar. O que varia entre
-plataformas são só duas operações: criar uma thread e esperá-la terminar. Essas
-duas ficam isoladas em `RosmiPosixTask.c`.
-
-Levar o ROSMI para um sistema operacional de tempo real é escrever um
-`RosmiFreeRtosTask.c` com `xTaskCreate` e a notificação equivalente. Nenhum
-outro arquivo muda — nem o algoritmo, nem a distribuição de trabalho.
-
-E se não houver arquivo de plataforma nenhum, o programa **continua correto**: a
-camada de tarefas detecta que não consegue criar threads e executa cada segmento
-no próprio contexto do chamador. Um alvo sem suporte a threads produz a mesma
-resposta, apenas sem paralelismo.
+plataformas são só duas operações: criar uma thread e esperá-la terminar, e
+essas ficam isoladas em `RosmiPosixTask.c`. Trocar de ambiente é trocar esse
+arquivo; nem o algoritmo nem a distribuição de trabalho mudam.
 
 ### 3.3 Apoio e programas
 
@@ -418,75 +410,23 @@ com uma biblioteca externa independente.
 
 ---
 
-## 6. Testes
+## 6. Validação
 
-```
-make test
-```
+O item 2 do enunciado pede executar e verificar a solução no exemplo fornecido.
+A verificação é feita em duas frentes.
 
-| Grupo | Asserções | O que cobre |
-|---|---:|---|
-| `TestRosmiUnionFind` | 343 | criação, união, transitividade, crescimento, falta de memória |
-| `TestRosmiImage` | 36 | leitura, polaridade dos bits, comentários, arquivos malformados |
-| `TestRosmiLabel` | 52 | imagens degeneradas, forma em U, conectividade 4 × 8, bordas |
-| `TestRosmiMerge` | 47 | objeto cruzando fronteira, canto de 4 segmentos, invariância |
-| `TestRosmiTask` | 47 | mesmo resultado com qualquer número de threads, cobertura dos segmentos |
-| `TestRosmiCli` | 29 | defaults, todas as opções, linhas de comando inválidas |
-| `TestRosmiReport` | 26 | cabeçalho escrito uma vez, traços, caminhos de erro |
-
-**580 asserções, todas passando.** Compilação sem nenhum aviso com
-`-Wall -Wextra -Wpedantic -Wshadow -Wconversion -Wsign-conversion -Wcast-qual
--Wstrict-prototypes -Wmissing-prototypes`.
-
-### A propriedade mais importante que os testes cobram
+### A propriedade cobrada
 
 > **O número de objetos de uma imagem não pode depender de quantas threads
 > foram usadas para contá-los, nem de como a imagem foi segmentada.**
 
-Se depender, o merge está errado. `TestRosmiMerge` compara o resultado das três
-fases contra a contagem da imagem inteira para seis segmentações diferentes e as
-duas conectividades. `TestRosmiTask` repete a rotulação com 1 a 32 threads e
-exige o mesmo resultado.
+Se depender, a reconciliação entre segmentos está errada. É essa invariância que
+os testes exigem.
 
-### Testando o que normalmente não se testa
+### Ponta a ponta
 
-Os caminhos de falta de memória são os mais difíceis de alcançar e, por isso, os
-que costumam ficar descobertos. A suíte substitui o alocador do componente por
-um controlável, que permite:
-
-- `TestAllocFailAfter(n)` — fazer a n-ésima alocação seguinte falhar, tornando
-  cada caminho de erro um caso de teste determinístico;
-- `TestAllocOutstanding()` — contar blocos entregues e não devolvidos,
-  transformando *"esta função liberou tudo no caminho de erro?"* de esperança em
-  asserção.
-
-### Cobertura
-
-```
-make coverage
-```
-
-| Módulo | Linhas | Ramos |
-|---|---:|---:|
-| `Rosmi.c` | 69,6% de 46 | 62,5% de 16 |
-| `RosmiCli.c` | 100,0% de 64 | 100,0% de 44 |
-| `RosmiImage.c` | 93,2% de 88 | 78,3% de 60 |
-| `RosmiLabel.c` | 98,7% de 159 | 90,0% de 110 |
-| `RosmiMerge.c` | 98,8% de 87 | 96,7% de 60 |
-| `RosmiPosixTask.c` | 92,6% de 27 | 50,0% de 10 |
-| `RosmiReport.c` | 97,1% de 70 | 95,5% de 44 |
-| `RosmiTask.c` | 84,4% de 77 | 70,8% de 48 |
-| `RosmiUnionFind.c` | 99,0% de 98 | 85,2% de 54 |
-| **TOTAL** | **94,4% de 716** | **86,3% de 446** |
-
-`Rosmi.c` fica mais baixo porque o binário de teste substitui as funções de
-memória pelo alocador controlável — os corpos originais nunca executam durante a
-suíte.
-
-### Verificação de ponta a ponta
-
-Além dos testes unitários, `tools/check.py` roda os binários sobre as imagens
-reais, variando conectividade e número de threads:
+`tools/check.py` roda os dois binários sobre as imagens reais, variando
+conectividade (4 e 8) e número de threads (1, 2, 4 e 8):
 
 ```
 mini        (2x2)  esperado 4     10/10 combinações ok
@@ -494,6 +434,24 @@ exemplo_2x3 (2x3)  esperado 13    10/10 combinações ok
 grande_8x6  (8x6)  esperado 275   10/10 combinações ok
 grande_7x7  (7x7)  esperado 281   10/10 combinações ok
 ```
+
+O caso `exemplo_2x3` é a figura do enunciado: **13 objetos**, com um deles
+atravessando os quatro segmentos centrais.
+
+### Testes unitários
+
+```
+make test        # 580 asserções em 7 grupos, uma por módulo
+make coverage    # 94,4% de linhas e 86,3% de ramos
+```
+
+`TestRosmiMerge` compara o resultado das três fases contra a contagem da imagem
+inteira em seis segmentações diferentes, e `TestRosmiTask` repete a rotulação
+com 1 a 32 threads exigindo sempre o mesmo número.
+
+A compilação não emite nenhum aviso com `-Wall -Wextra -Wpedantic -Wshadow
+-Wconversion -Wsign-conversion -Wcast-qual -Wstrict-prototypes
+-Wmissing-prototypes`.
 
 ---
 
@@ -529,7 +487,70 @@ Dois outros números dão a dimensão do desenho:
 
 ---
 
-## 8. Organização dos arquivos
+## 8. Modelos para o CAFES
+
+Os itens 4 e 5 do enunciado pedem a exploração da aplicação no CAFES. A ponte é
+`tools/gen_cafes.py`, que traduz a aplicação para os três formatos de entrada da
+ferramenta, a partir da mesma descrição, de modo que não possam divergir:
+
+| Modelo | Arquivo | O que descreve |
+|---|---|---|
+| **CWM** | `.CWG` | quem fala com quem e quantos phits, sem noção de tempo |
+| **ACPM** | `.ACPG` | o mesmo, com as mensagens agrupadas em fases |
+| **CDCM** | `.cdcg` | fases, dependências e o **tempo de computação** de cada etapa |
+
+A aplicação é modelada como `ME` (a memória que guarda a imagem), um `PA` por
+segmento e `PC` (o coletor, que faz a união global e produz a contagem). As
+fases são as mesmas da seção 2.3, mais a carga inicial:
+
+| Fase | Comunicação | Volume |
+|---|---|---|
+| 0 | `ME → PAs` | carga do segmento: K·L bits = 49 152 phits |
+| 1 e 2 | `PAs → vizinhos` | bordas: 1 536 e 2 048 phits |
+| 3 | `PAs → PC` | pares de equivalência: 114 phits |
+| 4 | `PC → PAs` | resultado: 2 phits |
+
+O tempo de computação de cada tile vem do traço medido (`rosmi_par --trace`), e
+não de estimativa. Usa-se o traço de **uma thread**: com várias threads
+disputando os mesmos núcleos e a mesma memória da máquina de desenvolvimento, o
+tempo por tile incha e passa a medir contenção do host, não o trabalho do tile.
+Na NoC alvo cada tile tem processador e memória próprios.
+
+```bash
+python3 tools/gen_cafes.py --case data/grande_7x7 --out cafes/         --trace results/grande_7x7_p1_tiles.csv
+python3 tools/check_cafes.py cafes/grande_7x7
+```
+
+`check_cafes.py` confere os arquivos contra a gramática que o CAFES espera —
+seções obrigatórias, malha com tiles suficientes, arestas ligando apenas núcleos
+declarados e matriz de mapeamento com as dimensões exatas da malha.
+
+### O que o tráfego revela
+
+| Caso | Carga (ME→PA) | Bordas (PA→PA) | Total |
+|---|---|---|---|
+| `exemplo_2x3` | 294 912 (95,8%) | 12 288 (4,0%) | 307 896 |
+| `grande_8x6` | 2 359 296 (93,9%) | 147 456 (5,9%) | 2 512 320 |
+| `grande_7x7` | 2 408 448 (93,9%) | 150 528 (5,9%) | 2 564 660 |
+
+**A troca de bordas custa cerca de 6% do tráfego; quase 94% é alimentar os tiles
+com os pixels.** A parte conceitualmente difícil do problema é barata em
+comunicação — o gargalo da arquitetura é a banda da memória para os tiles, não o
+diálogo entre vizinhos.
+
+Isso tem consequência direta para o item 5: segmentar mais fino **não** aumenta o
+tráfego de carga, que depende só do tamanho da imagem. Aumenta apenas a parcela
+das bordas, que é a pequena.
+
+### Estado
+
+Os nove arquivos (3 segmentações × 3 modelos) estão gerados e validados, e
+carregam na ferramenta. **A avaliação em si — rodar os mapeamentos e colher
+tempo e energia — ainda não foi feita**, e exige a interface do CAFES.
+
+---
+
+## 9. Organização dos arquivos
 
 ```
 src/
@@ -545,6 +566,8 @@ src/
   RosmiSeqMain.c         programa sequencial
   RosmiParMain.c         programa paralelo
 
+cafes/                   modelos CWM, ACPM e CDCM das tres segmentacoes
+docs/                    diagrama do fluxo de processamento (.excalidraw)
 test/                    um arquivo de teste por módulo
 tools/                   geração de imagens, validação e relatórios
 data/                    imagens de teste com resposta conhecida
