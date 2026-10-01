@@ -10,23 +10,48 @@ Implementação em C, com versão sequencial e versão paralela parametrizável.
 
 ## 1. O problema
 
-Uma imagem binária tem apenas dois valores: **0 é fundo** e **1 é objeto**. Um
-objeto é um conjunto de pixels contíguos — pixels acesos que se encostam formam
-um único objeto.
+> Este trabalho consiste da modelagem, exploração e caracterização de uma
+> aplicação paralela, cujo objetivo é reconhecer objetos por segmentação de
+> imagens dispostas em uma matriz de N × M segmentos, sendo cada segmento
+> composto por K × L pixels.
+>
+> *"Dada uma matriz de N × M de segmentos de imagens binárias, com pixels de um
+> valor que representam o fundo (e.g. valor 0) e com pixels de outro valor que
+> representam os objetos (e.g. valor 1), onde um objeto é um conjunto de pixels
+> contíguos, o algoritmo de reconhecimento de imagem deve contabilizar todos os
+> objetos identificados **uma única vez**."*
+>
+> — enunciado do trabalho
 
-A imagem é grande e foi recortada em um tabuleiro de N × M segmentos, cada um
-com K × L pixels. No exemplo do enunciado são 2 × 3 segmentos de 768 × 1024
-pixels cada.
+### A imagem do enunciado
 
-Contar objetos dentro de um segmento é um problema clássico e resolvido. A
-dificuldade está em outro lugar: **um objeto pode atravessar a fronteira entre
-segmentos**, e nesse caso cada lado o enxerga como se fosse um objeto próprio.
+![Imagem de exemplo do enunciado: 2 x 3 segmentos de 768 x 1024 pixels](docs/imagem.png)
 
-### Por que não basta dividir e somar
+A figura mostra uma imagem com **N = 2 × M = 3 segmentos**, cada um com
+**K = 768 × L = 1024 pixels**.
 
-Vamos a uma imagem de 8 × 4 pixels, dividida em 2 × 2 segmentos de 2 linhas por
-4 colunas. É pequena o bastante para conferir no papel e já contém toda a
-dificuldade do caso real.
+O segmento **(0,1)** tem 2 objetos locais e participa de um objeto **distribuído
+nos segmentos (0,0), (0,1), (1,0) e (1,1)** — o hexágono no centro. Esse objeto
+distribuído só pode ser contabilizado **uma única vez** ao concluir o total da
+imagem, que para este exemplo é de **13 objetos**.
+
+É exatamente aí que mora a dificuldade. Contar objetos dentro de um segmento é
+um problema clássico e resolvido; o que não é trivial é que **um objeto pode
+atravessar a fronteira entre segmentos**, e nesse caso cada lado o enxerga como
+se fosse um objeto próprio. Somando as contagens locais desta figura chega-se a
+**16**, e não a 13.
+
+### Demonstrando o raciocínio numa escala menor
+
+> **Nota.** A figura acima é o caso real do enunciado: 1536 × 3072 pixels e 13
+> objetos, grande demais para acompanhar passo a passo. Daqui em diante o
+> raciocínio é demonstrado numa imagem **reduzida de 8 × 4 pixels**, pequena o
+> bastante para ser conferida no papel. Ela tem a mesma estrutura do caso real —
+> objetos locais e um objeto atravessando fronteira — e é a mesma imagem usada
+> nos diagramas e nos testes (`data/mini.pbm`).
+
+A imagem reduzida tem 8 × 4 pixels, dividida em 2 × 2 segmentos de 2 linhas por
+4 colunas.
 
 ```
         c0 c1 c2 c3 | c4 c5 c6 c7
@@ -59,9 +84,10 @@ Agora a abordagem ingênua: cada segmento conta o que vê, e somamos no final.
 Deu **5**, mas a resposta é **4**. O objeto B foi contado duas vezes, porque
 nenhum dos dois lados tinha como saber que a outra metade existia.
 
-Não é um detalhe de borda. Nos casos grandes deste projeto a soma ingênua erra
-em **38%** — 380 contra 275, e 389 contra 281. Qualquer solução que particione a
-imagem e some os resultados está errada por construção.
+O mesmo que acontece na figura do enunciado, onde a soma ingênua dá 16 em vez
+de 13. E não é um detalhe de borda: nos casos grandes deste projeto a soma
+ingênua erra em **38%** — 380 contra 275, e 389 contra 281. Qualquer solução que
+particione a imagem e some os resultados está errada por construção.
 
 > **A reconciliação entre segmentos é o núcleo do problema, não um acessório.**
 
@@ -415,9 +441,13 @@ ROSMI paralelo (C)
 | `grande_8x6` | 8 × 6 | 48 | 6144 × 6144 | **275** | 35 | 380 |
 | `grande_7x7` | 7 × 7 | 49 | 5376 × 7168 | **281** | 36 | 389 |
 
-O caso `exemplo_2x3` reproduz a figura do enunciado: 13 objetos, um deles
-atravessando os quatro segmentos centrais. Em todos os casos grandes há objetos
-tocando 4 segmentos simultaneamente.
+O caso `exemplo_2x3` reproduz a figura mostrada na seção 1: mesma segmentação,
+mesmas dimensões e os mesmos **13 objetos**, com um deles atravessando os quatro
+segmentos centrais. Em todos os casos grandes há objetos tocando 4 segmentos
+simultaneamente.
+
+O caso `mini` é a imagem reduzida de 8 × 4 pixels usada na seção 1 para
+demonstrar o raciocínio e nos diagramas.
 
 As imagens são geradas por `tools/gen_image.py`, que conhece a resposta **por
 construção**: nenhum objeto encosta em outro, então o número de componentes
@@ -450,9 +480,6 @@ exemplo_2x3 (2x3)  esperado 13    10/10 combinações ok
 grande_8x6  (8x6)  esperado 275   10/10 combinações ok
 grande_7x7  (7x7)  esperado 281   10/10 combinações ok
 ```
-
-O caso `exemplo_2x3` é a figura do enunciado: **13 objetos**, com um deles
-atravessando os quatro segmentos centrais.
 
 ### Testes unitários
 
