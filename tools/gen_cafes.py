@@ -202,11 +202,30 @@ class App:
     # Posicoes so para o desenho na interface do CAFES                    #
     # ------------------------------------------------------------------ #
     def core_xy(self):
-        xy = {"ME": (50, 50)}
+        """Posicoes dos nucleos no desenho da interface do CAFES.
+
+        O CAFES desenha cada nucleo como um circulo de raio 30, ou seja 60 de
+        diametro. O espacamento abaixo deixa mais de um diametro de folga entre
+        vizinhos, para que os circulos nao se toquem e os rotulos de phits nas
+        arestas continuem legiveis -- essas telas vao para o relatorio.
+
+        Os PA ficam na mesma disposicao dos segmentos que representam, de modo
+        que o desenho da aplicacao tenha a forma da imagem. ME e PC ficam nas
+        laterais, fora da grade, porque falam com todos.
+        """
+        step_x = 170
+        step_y = 150
+        margin = 90
+
+        xy = {}
+        grid_x = margin + step_x
         for r in range(self.N):
             for c in range(self.M):
-                xy[f"PA{self.seg(r, c)}"] = (150 + c * 90, 130 + r * 70)
-        xy["PC"] = (150 + self.M * 90, 50)
+                xy[f"PA{self.seg(r, c)}"] = (grid_x + (c * step_x),
+                                             margin + (r * step_y))
+        middle = margin + (((self.N - 1) * step_y) // 2)
+        xy["ME"] = (margin, middle)
+        xy["PC"] = (grid_x + ((self.M - 1) * step_x) + step_x, middle)
         return xy
 
     def mapping(self, rows, cols):
@@ -309,7 +328,6 @@ def write_acpg(app, rows, cols, path):
 def write_cdcg(app, rows, cols, path):
     """CDCM: grafo de dependencias com tempo de computacao por mensagem."""
     edges = app.edges()
-    ids = list(range(len(edges)))
     by_phase = {}
     for i, e in enumerate(edges):
         by_phase.setdefault(e[0], []).append(i)

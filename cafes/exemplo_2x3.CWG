@@ -2,14 +2,14 @@
  2 4
 
 #_CWG_Graphic (list of: core x y)
- ME 50 50
- PA0 150 130
- PA1 240 130
- PA2 330 130
- PA3 150 200
- PA4 240 200
- PA5 330 200
- PC 420 50
+ ME 90 165
+ PA0 260 90
+ PA1 430 90
+ PA2 600 90
+ PA3 260 240
+ PA4 430 240
+ PA5 600 240
+ PC 770 165
 
 #_CWG_Vertices (list of: vertices)
  ME
