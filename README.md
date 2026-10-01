@@ -119,8 +119,13 @@ No final, **o número de objetos é o número de chefes que sobraram**.
 
 ### 2.3 Paralelizar: rotular localmente, unir nas bordas
 
-> O diagrama [`docs/fluxo-processamento.excalidraw`](docs/fluxo-processamento.excalidraw)
-> percorre as três fases sobre esta mesma imagem de 8 × 4 pixels.
+O diagrama abaixo percorre as três fases sobre esta mesma imagem de 8 × 4
+pixels, da entrada até a contagem final.
+
+![Fluxo de processamento do ROSMI](docs/processamento.png)
+
+*Fonte editável: [`docs/fluxo-processamento.excalidraw`](docs/fluxo-processamento.excalidraw)
+· versão vetorial: [`docs/processamento.svg`](docs/processamento.svg)*
 
 A parte fácil é que cada segmento pode ser rotulado sozinho, sem falar com
 ninguém. A parte difícil é a reconciliação. E aqui está a ideia central do
@@ -224,9 +229,13 @@ imediatamente.
 
 ## 3. Arquitetura do código
 
-> O diagrama [`docs/arquitetura-modulos.excalidraw`](docs/arquitetura-modulos.excalidraw)
-> mostra este fluxo bloco a bloco, indicando o arquivo `.c` que implementa cada
-> etapa e o dado que atravessa cada seta.
+O diagrama abaixo mostra o mesmo fluxo bloco a bloco, indicando o arquivo `.c`
+que implementa cada etapa e o dado que atravessa cada seta.
+
+![Arquitetura do ROSMI por módulo](docs/processamento_modulos.png)
+
+*Fonte editável: [`docs/arquitetura-modulos.excalidraw`](docs/arquitetura-modulos.excalidraw)
+· versão vetorial: [`docs/processamento_modulos.svg`](docs/processamento_modulos.svg)*
 
 O código foi organizado em **três camadas**, com uma regra: cada camada só pode
 depender das que estão abaixo dela.
@@ -574,7 +583,7 @@ src/
   RosmiParMain.c         programa paralelo
 
 cafes/                   modelos CWM, ACPM e CDCM das tres segmentacoes
-docs/                    diagramas em .excalidraw: fluxo e arquitetura
+docs/                    diagramas do fluxo e da arquitetura (.excalidraw, .png, .svg)
 test/                    um arquivo de teste por módulo
 tools/                   geração de imagens, validação e relatórios
 data/                    imagens de teste com resposta conhecida
