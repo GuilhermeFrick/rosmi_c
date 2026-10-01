@@ -1,0 +1,23 @@
+# Artefatos de compilacao
+build/
+bin/
+coverage/
+*.o
+*.exe
+
+# Instrumentacao de cobertura
+*.gcno
+*.gcda
+*.gcov
+
+# Arquivos temporarios dos testes
+test_image_tmp.pbm
+test_report_tmp*.csv
+
+# Resultados de execucao
+results/
+cafes/
+
+# Python
+__pycache__/
+*.pyc
