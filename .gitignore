@@ -14,9 +14,8 @@ coverage/
 test_image_tmp.pbm
 test_report_tmp*.csv
 
-# Resultados de execucao
+# Tracos de execucao: sao regerados por 'rosmi_par --trace'
 results/
-cafes/
 
 # Python
 __pycache__/
