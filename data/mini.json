@@ -1,0 +1,15 @@
+{
+  "N": 2,
+  "M": 2,
+  "K": 2,
+  "L": 4,
+  "ground_truth": 4,
+  "objects_local": 3,
+  "objects_crossing": 1,
+  "seed": 0,
+  "margin_px": 0,
+  "width": 8,
+  "height": 4,
+  "segments": 4,
+  "pbm": "mini.pbm"
+}

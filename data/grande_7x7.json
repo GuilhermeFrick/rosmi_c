@@ -1,0 +1,15 @@
+{
+  "N": 7,
+  "M": 7,
+  "K": 768,
+  "L": 1024,
+  "width": 7168,
+  "height": 5376,
+  "segments": 49,
+  "ground_truth": 281,
+  "objects_local": 245,
+  "objects_crossing": 36,
+  "seed": 11,
+  "margin_px": 6,
+  "pbm": "grande_7x7.pbm"
+}

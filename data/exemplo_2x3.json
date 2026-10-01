@@ -1,0 +1,15 @@
+{
+  "N": 2,
+  "M": 3,
+  "K": 768,
+  "L": 1024,
+  "width": 3072,
+  "height": 1536,
+  "segments": 6,
+  "ground_truth": 13,
+  "objects_local": 12,
+  "objects_crossing": 1,
+  "seed": 42,
+  "margin_px": 6,
+  "pbm": "exemplo_2x3.pbm"
+}
