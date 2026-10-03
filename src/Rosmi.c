@@ -6,6 +6,9 @@
  * \date      2026-09-28
  * \copyright Copyright (c) 2026
  */
+/* -std=c11 hides POSIX; clock_gettime and sysconf need it exposed */
+#define _POSIX_C_SOURCE 200809L
+
 #include "Rosmi.h"
 #include <stdlib.h>
 #include <time.h>
