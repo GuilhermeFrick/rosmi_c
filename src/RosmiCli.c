@@ -117,7 +117,7 @@ RosmiReturn_e RosmiCliParse(RosmiCli_t *options, int argc, char **argv)
 void RosmiCliUsage(const char *program)
 {
     (void)fprintf(stderr,
-                  "uso: %s <imagem.pbm> --N <n> --M <m> [--conn 4|8] [--threads <p>]\n"
+                  "uso: %s <imagem.png|.pbm> --N <n> --M <m> [--conn 4|8] [--threads <p>]\n"
                   "            [--reps <r>] [--csv <arquivo>] [--trace <prefixo>]\n"
                   "  --N, --M   numero de segmentos na vertical e na horizontal\n"
                   "  --conn     conectividade de 'pixels contiguos' (padrao: 4)\n"

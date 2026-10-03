@@ -31,6 +31,7 @@
 #include "RosmiImage.h"
 #include "RosmiLabel.h"
 #include "RosmiMerge.h"
+#include "RosmiPng.h"
 #include "RosmiReport.h"
 #include "RosmiTask.h"
 #include "RosmiUnionFind.h"
@@ -103,7 +104,7 @@ int main(int argc, char **argv)
         }
         status = 1;
 
-        ret = RosmiImageLoadPbm(&image, options.image);
+        ret = RosmiImageLoad(&image, options.image);
         if (ret != ROSMI_RET_OK)
         {
             (void)fprintf(stderr, "erro ao abrir '%s': %s\n", options.image, RosmiReturnStr(ret));

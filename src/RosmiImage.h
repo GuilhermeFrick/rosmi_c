@@ -31,8 +31,9 @@ extern "C"
 
     /*!
      *  \brief Binary image held in memory
-     *  \details Read only for users; only \ref RosmiImageLoadPbm and
-     *           \ref RosmiImageRelease change the fields.
+     *  \details Read only for users; only the loaders (\ref RosmiImageLoadPbm,
+     *           \ref RosmiImageLoadPng) and \ref RosmiImageRelease change the
+     *           fields.
      */
     typedef struct RosmiImageDefinition
     {

@@ -27,7 +27,7 @@ extern "C"
      */
     typedef struct RosmiCliDefinition
     {
-        const char *        image;    /**<Path of the .pbm image, positional*/
+        const char *        image;    /**<Path of the .png or .pbm image, positional*/
         const char *        csv;      /**<Results file to append to, or NULL*/
         const char *        trace;    /**<Trace path prefix, or NULL*/
         int32_t             seg_rows; /**<--N, segments down*/
