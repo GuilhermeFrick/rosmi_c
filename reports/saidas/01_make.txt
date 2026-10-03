@@ -1,0 +1,15 @@
+$ make
+gcc -std=c11 -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Wsign-conversion -Wcast-qual -Wstrict-prototypes -Wmissing-prototypes -O2 -Isrc -c src/Rosmi.c -o build/Rosmi.o
+gcc -std=c11 -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Wsign-conversion -Wcast-qual -Wstrict-prototypes -Wmissing-prototypes -O2 -Isrc -c src/RosmiImage.c -o build/RosmiImage.o
+gcc -std=c11 -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Wsign-conversion -Wcast-qual -Wstrict-prototypes -Wmissing-prototypes -O2 -Isrc -c src/RosmiUnionFind.c -o build/RosmiUnionFind.o
+gcc -std=c11 -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Wsign-conversion -Wcast-qual -Wstrict-prototypes -Wmissing-prototypes -O2 -Isrc -c src/RosmiLabel.c -o build/RosmiLabel.o
+gcc -std=c11 -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Wsign-conversion -Wcast-qual -Wstrict-prototypes -Wmissing-prototypes -O2 -Isrc -c src/RosmiMerge.c -o build/RosmiMerge.o
+gcc -std=c11 -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Wsign-conversion -Wcast-qual -Wstrict-prototypes -Wmissing-prototypes -O2 -Isrc -c src/RosmiCli.c -o build/RosmiCli.o
+gcc -std=c11 -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Wsign-conversion -Wcast-qual -Wstrict-prototypes -Wmissing-prototypes -O2 -Isrc -c src/RosmiReport.c -o build/RosmiReport.o
+gcc -std=c11 -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Wsign-conversion -Wcast-qual -Wstrict-prototypes -Wmissing-prototypes -O2 -Isrc -c src/RosmiPng.c -o build/RosmiPng.o
+gcc -std=c11 -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Wsign-conversion -Wcast-qual -Wstrict-prototypes -Wmissing-prototypes -O2 -Isrc -c src/RosmiSeqMain.c -o build/RosmiSeqMain.o
+gcc -std=c11 -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Wsign-conversion -Wcast-qual -Wstrict-prototypes -Wmissing-prototypes -O2 -Isrc build/Rosmi.o build/RosmiImage.o build/RosmiUnionFind.o build/RosmiLabel.o build/RosmiMerge.o build/RosmiCli.o build/RosmiReport.o build/RosmiPng.o build/RosmiSeqMain.o -o bin/rosmi_seq -lpng
+gcc -std=c11 -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Wsign-conversion -Wcast-qual -Wstrict-prototypes -Wmissing-prototypes -O2 -Isrc -c src/RosmiTask.c -o build/RosmiTask.o
+gcc -std=c11 -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Wsign-conversion -Wcast-qual -Wstrict-prototypes -Wmissing-prototypes -O2 -Isrc -c src/RosmiPosixTask.c -o build/RosmiPosixTask.o
+gcc -std=c11 -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Wsign-conversion -Wcast-qual -Wstrict-prototypes -Wmissing-prototypes -O2 -Isrc -c src/RosmiParMain.c -o build/RosmiParMain.o
+gcc -std=c11 -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Wsign-conversion -Wcast-qual -Wstrict-prototypes -Wmissing-prototypes -O2 -Isrc build/Rosmi.o build/RosmiImage.o build/RosmiUnionFind.o build/RosmiLabel.o build/RosmiMerge.o build/RosmiCli.o build/RosmiReport.o build/RosmiTask.o build/RosmiPosixTask.o build/RosmiPng.o build/RosmiParMain.o -o bin/rosmi_par -pthread -lpng

@@ -1,0 +1,108 @@
+CAFES -- Brief CAFES description.
+
+The CAFES home page is
+
+    https://corfu.pucrs.br/redmine/cafes
+
+There you can get the latest version, view the documentation, or
+report bugs.  There is also a Forum for CAFES users.  You
+can subscribe to the forum or view the archive of old articles
+at
+
+    https://corfu.pucrs.br/redmine/projects/cafes/boards
+
+
+Documentation
+-------------
+
+to be done
+
+Installation on Linux
+------------
+
+Quick instructions:
+
+1. copy the project to the intalation dir. For example:
+cp -r cafes /opt/cafes/
+
+2. open the projeto with Eclipse to compile the packages.
+It will generate .class files in to the class subfolder
+
+3. set the CAFES_HOME environment variable. For example:
+export CAFES_HOME=/opt/cafes/
+
+4. add cafes to the PATH
+export PATH=$PATH:$CAFES_HOME/bin
+
+5. run cafes
+cafes.sh
+
+More information:
+
+
+Installation on Windows
+-----------------------
+
+Quick instructions:
+
+1. step 1. to be done
+
+2. step 2.
+
+3. step 3.
+
+More information:
+
+
+
+Assistance
+----------
+
+If you are having trouble installing or using Gnuplot.py, please check
+the following sources for help:
+
+1. Read the documentation!  For simple questions, start with the
+   Gnuplot.html, README.txt, and FAQ.txt files in the distribution.
+   For more detailed information, check the online class documentation
+   at
+
+       http://gnuplot-py.sourceforge.net/doc/
+
+2. Check the mailing list archives.  Chances are that somebody has
+   already asked a similar questions and you are one quick search away
+   from the answer.  Information about the mailing list is available
+   at
+
+       http://lists.sourceforge.net/mailman/listinfo/gnuplot-py-users
+
+3. Ask your question on the mailing list.  I am trying to move most
+   email traffic about Gnuplot.py to the mailing list, partly because
+   there are many questions (for example about Windows or Macintosh
+   platforms) that I am completely unable to answer.  The mailing list
+   also provides an archive of old articles which should build up into
+   a valuable resource, and a place to exchange ideas about future
+   changes.
+
+
+Feedback
+--------
+
+I would love to have feedback from people letting me know whether they
+find Gnuplot.py useful.  And certainly let me know about any problems,
+suggestions, or enhancements.  For most purposes, please send your
+emails to the Gnuplot.py users mailing list:
+
+    gnuplot-py-users@lists.sourceforge.net
+
+Information about the mailing list can be obtained at
+
+    http://lists.sourceforge.net/mailman/listinfo/gnuplot-py-users
+
+
+License
+-------
+
+See the file LICENSE.txt for license info.  In brief, Gnuplot is LGPL.
+
+
+--

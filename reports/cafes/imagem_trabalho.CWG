@@ -1,0 +1,53 @@
+#_NoC_Size (lines columns)
+ 2 4
+
+#_CWG_Graphic (list of: core x y)
+ ME 90 165
+ PA0 260 90
+ PA1 430 90
+ PA2 600 90
+ PA3 260 240
+ PA4 430 240
+ PA5 600 240
+ PC 770 165
+
+#_CWG_Vertices (list of: vertices)
+ ME
+ PA0
+ PA1
+ PA2
+ PA3
+ PA4
+ PA5
+ PC
+
+#_CWG_Edges (list of: sourceVertex - targetVertex numberOfPhitsTransmited)
+ ME - PA0 49152
+ ME - PA1 49152
+ ME - PA2 49152
+ ME - PA3 49152
+ ME - PA4 49152
+ ME - PA5 49152
+ PA0 - PA1 1536
+ PA0 - PA3 2048
+ PA0 - PC 114
+ PA1 - PA2 1536
+ PA1 - PA4 2048
+ PA1 - PC 114
+ PA2 - PA5 2048
+ PA2 - PC 114
+ PA3 - PA4 1536
+ PA3 - PC 114
+ PA4 - PA5 1536
+ PA4 - PC 114
+ PA5 - PC 114
+ PC - PA0 2
+ PC - PA1 2
+ PC - PA2 2
+ PC - PA3 2
+ PC - PA4 2
+ PC - PA5 2
+
+#_CWG2NoC_Mapping (matrix of: cores)
+ PA0 PA1 PA2 ME
+ PA3 PA4 PA5 PC

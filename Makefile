@@ -9,6 +9,11 @@
 # modulos funcionais, o que garante, e nao apenas promete, que nao ha
 # concorrencia nela.
 #
+# Os dois programas ligam RosmiPng.c, que le a imagem PNG entregue com o
+# enunciado. E o unico modulo que depende de biblioteca externa (libpng), por
+# isso fica fora de CORE: o nucleo funcional continua compilando so com um
+# compilador C.
+#
 # A versao paralela liga RosmiPosixTask.c, que sobrepoe por simbolo forte as
 # duas funcoes fracas de criacao e juncao de thread. Trocar esse unico arquivo
 # leva a aplicacao para outra plataforma.
@@ -33,6 +38,7 @@ WARN    := -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Wsign-conversion \
            -Wcast-qual -Wstrict-prototypes -Wmissing-prototypes
 OPT     ?= -O2
 CFLAGS  := $(STD) $(WARN) $(OPT) -I$(SRC)
+PNGLIBS ?= -lpng
 
 # Os testes usam o mesmo conjunto, menos -Wcast-qual: as macros EXPECT_STREQ
 # do uTest recebem char* e nao const char*, entao comparar com um literal
@@ -44,13 +50,17 @@ TESTWARN := $(filter-out -Wcast-qual,$(WARN))
 CORE     := Rosmi RosmiImage RosmiUnionFind RosmiLabel RosmiMerge RosmiCli RosmiReport
 # Camada de tarefas e o port que a torna funcional.
 PAR      := RosmiTask RosmiPosixTask
+# Entrada de imagem que depende de biblioteca externa.
+IO       := RosmiPng
 # Modulos cobrados pelo relatorio de cobertura.
-COVERED  := $(CORE) $(PAR)
+COVERED  := $(CORE) $(PAR) $(IO)
 
 CORE_SRC := $(addprefix $(SRC)/,$(addsuffix .c,$(CORE)))
 PAR_SRC  := $(addprefix $(SRC)/,$(addsuffix .c,$(PAR)))
 CORE_OBJ := $(addprefix $(BUILD)/,$(addsuffix .o,$(CORE)))
 PAR_OBJ  := $(addprefix $(BUILD)/,$(addsuffix .o,$(PAR)))
+IO_SRC   := $(addprefix $(SRC)/,$(addsuffix .c,$(IO)))
+IO_OBJ   := $(addprefix $(BUILD)/,$(addsuffix .o,$(IO)))
 
 # uTest.c vem do componente uTest e nao segue o conjunto estrito de avisos
 # deste projeto, entao e compilado a parte com -w, para que o build so mostre
@@ -58,7 +68,7 @@ PAR_OBJ  := $(addprefix $(BUILD)/,$(addsuffix .o,$(PAR)))
 UTEST_SRC := $(TEST)/uTest.c
 
 TEST_SRC := $(TEST)/TestRosmiHost.c $(TEST)/TestRosmiAlloc.c $(TEST)/TestRosmiFixture.c \
-            $(TEST)/TestRosmiUnionFind.c $(TEST)/TestRosmiImage.c \
+            $(TEST)/TestRosmiUnionFind.c $(TEST)/TestRosmiImage.c $(TEST)/TestRosmiPng.c \
             $(TEST)/TestRosmiLabel.c $(TEST)/TestRosmiMerge.c \
             $(TEST)/TestRosmiTask.c $(TEST)/TestRosmiCli.c \
             $(TEST)/TestRosmiReport.c $(TEST)/TestRosmiMain.c
@@ -79,11 +89,11 @@ covdir:
 $(BUILD)/%.o: $(SRC)/%.c | dirs
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(BIN)/rosmi_seq: $(CORE_OBJ) $(BUILD)/RosmiSeqMain.o
-	$(CC) $(CFLAGS) $^ -o $@
+$(BIN)/rosmi_seq: $(CORE_OBJ) $(IO_OBJ) $(BUILD)/RosmiSeqMain.o
+	$(CC) $(CFLAGS) $^ -o $@ $(PNGLIBS)
 
-$(BIN)/rosmi_par: $(CORE_OBJ) $(PAR_OBJ) $(BUILD)/RosmiParMain.o
-	$(CC) $(CFLAGS) $^ -o $@ -pthread
+$(BIN)/rosmi_par: $(CORE_OBJ) $(PAR_OBJ) $(IO_OBJ) $(BUILD)/RosmiParMain.o
+	$(CC) $(CFLAGS) $^ -o $@ -pthread $(PNGLIBS)
 
 # ---- testes unitarios -----------------------------------------------------
 # A suite liga TestRosmiAlloc.c, cujas definicoes fortes de RosmiMalloc e
@@ -92,8 +102,8 @@ $(BIN)/rosmi_par: $(CORE_OBJ) $(PAR_OBJ) $(BUILD)/RosmiParMain.o
 # uTest, fornecendo TestWrite e TestGetTick.
 test: dirs
 	$(CC) $(STD) -w -O2 -I$(SRC) -I$(TEST) -c $(UTEST_SRC) -o $(BUILD)/uTest.o
-	$(CC) $(STD) $(TESTWARN) $(OPT) -I$(SRC) -I$(TEST) $(CORE_SRC) $(PAR_SRC) $(TEST_SRC) $(BUILD)/uTest.o \
-		-o $(BIN)/rosmi_test -pthread
+	$(CC) $(STD) $(TESTWARN) $(OPT) -I$(SRC) -I$(TEST) $(CORE_SRC) $(PAR_SRC) $(IO_SRC) $(TEST_SRC) $(BUILD)/uTest.o \
+		-o $(BIN)/rosmi_test -pthread $(PNGLIBS)
 	@echo
 	@$(BIN)/rosmi_test
 
@@ -116,9 +126,9 @@ $(COV)/uTest.o: $(UTEST_SRC) | covdir
 
 coverage: covdir $(COV)/uTest.o $(COV_APP_OBJ) $(COV_TEST_OBJ)
 	$(CC) --coverage $(COV)/uTest.o $(COV_APP_OBJ) $(COV_TEST_OBJ) \
-		-o $(COV)/rosmi_test -pthread
+		-o $(COV)/rosmi_test -pthread $(PNGLIBS)
 	@./$(COV)/rosmi_test > $(COV)/rosmi_test.log
-	@cd $(COV) && $(GCOV) -b -o . $(addprefix ../,$(CORE_SRC) $(PAR_SRC)) > gcov.log 2>&1 || true
+	@cd $(COV) && $(GCOV) -b -o . $(addprefix ../,$(CORE_SRC) $(PAR_SRC) $(IO_SRC)) > gcov.log 2>&1 || true
 	@echo
 	@echo "=== cobertura por modulo ==="
 	@$(PYTHON) $(TOOLS)/gcov_summary.py $(COV)/gcov.log
@@ -126,4 +136,4 @@ coverage: covdir $(COV)/uTest.o $(COV_APP_OBJ) $(COV_TEST_OBJ)
 	@echo "relatorios .gcov detalhados em $(COV)/"
 
 clean:
-	rm -rf $(BUILD) $(BIN) $(COV) *.gcov *.gcda *.gcno test_image_tmp.pbm
+	rm -rf $(BUILD) $(BIN) $(COV) *.gcov *.gcda *.gcno test_image_tmp.pbm test_image_tmp*.png

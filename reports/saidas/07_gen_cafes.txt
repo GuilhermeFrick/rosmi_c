@@ -1,0 +1,13 @@
+$ python3 tools/gen_cafes.py --case reports/imagem_trabalho --out reports/cafes --trace reports/saidas/trabalho_p1_tiles.csv
+imagem_trabalho: 2x3 = 6 segmentos de 768x1024
+  nucleos            : 8 (ME + 6 PA + PC)
+  NoC                : 2x4 = 8 tiles  (sobra 0)
+  phit               : 16 bits
+  ME->PA             : 49152 phits (segmento de 768x1024 bits)
+  borda vertical     : 1536 phits (768 rotulos de 32 bits)
+  borda horizontal   : 2048 phits (1024 rotulos de 32 bits)
+  mensagens          : 25
+  trafego total      : 307896 phits
+  computacao por tile: 111635..138518 ciclos  (medida)
+  mapeamento natural : emitido
+  gerados            : reports/cafes/imagem_trabalho.CWG .ACPG .cdcg

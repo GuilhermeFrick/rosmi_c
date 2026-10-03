@@ -1,0 +1,5 @@
+$ for p in 1 2 4 8; do bin/rosmi_par reports/imagem_trabalho.png --N 2 --M 3 --conn 8 --threads $p | grep OBJETOS; done
+threads=1    OBJETOS           : 13
+threads=2    OBJETOS           : 13
+threads=4    OBJETOS           : 13
+threads=8    OBJETOS           : 13

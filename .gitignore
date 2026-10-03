@@ -11,7 +11,7 @@ coverage/
 *.gcov
 
 # Arquivos temporarios dos testes
-test_image_tmp.pbm
+test_image_tmp*
 test_report_tmp*.csv
 
 # Tracos de execucao: sao regerados por 'rosmi_par --trace'

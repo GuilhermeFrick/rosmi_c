@@ -17,6 +17,7 @@ void TestRosmi(void)
 {
     TestRosmiUnionFind();
     TestRosmiImage();
+    TestRosmiPng();
     TestRosmiLabel();
     TestRosmiMerge();
     TestRosmiTask();
