@@ -79,7 +79,7 @@ O passo a passo completo, com prints, está em
 src/            código C (um módulo por arquivo)
 test/           testes unitários
 data/           imagens de teste com resposta conhecida
-docs/           imagem oficial, diagramas e fundamentos
+docs/           enunciado, imagem oficial, diagramas e fundamentos
 reports/        exemplo do enunciado passo a passo
 cafes/          modelos do CAFES das três segmentações
 tools/          scripts auxiliares (geração de imagens, modelos, cafes.sh)
