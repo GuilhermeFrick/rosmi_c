@@ -1,0 +1,8 @@
+$ bin/rosmi_seq reports/imagem_trabalho.png --N 2 --M 3 --conn 8
+ROSMI sequencial (C)
+  imagem            : reports/imagem_trabalho.png (1536 x 3072 px)
+  segmentacao       : N=2 x M=3 de K=768 x L=1024
+  conectividade     : 8
+  OBJETOS           : 13
+  soma ingenua      : 18 (conta 5 vez(es) a mais os distribuidos)
+  tempo (imagem)    : 0.010434 s

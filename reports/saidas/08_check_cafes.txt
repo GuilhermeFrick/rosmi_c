@@ -1,0 +1,5 @@
+$ python3 tools/check_cafes.py reports/cafes/imagem_trabalho
+reports/cafes/imagem_trabalho
+  CWM   .CWG   ok (25 registros)
+  ACPM  .ACPG  ok (25 registros)
+  CDCM  .cdcg  ok (25 registros)

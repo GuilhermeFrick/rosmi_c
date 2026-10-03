@@ -1,0 +1,8 @@
+origem,destino,r_o,c_o,r_d,c_d,tipo,bytes
+0,1,0,0,0,1,horizontal,3072
+1,2,0,1,0,2,horizontal,3072
+3,4,1,0,1,1,horizontal,3072
+4,5,1,1,1,2,horizontal,3072
+0,3,0,0,1,0,vertical,4096
+1,4,0,1,1,1,vertical,4096
+2,5,0,2,1,2,vertical,4096
