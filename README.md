@@ -22,6 +22,10 @@ Sem o passo 2, um objeto que atravessa 4 segmentos seria contado 4 vezes.
 sudo apt install build-essential libpng-dev default-jre
 ```
 
+Ou, sem instalar nada: no GitHub, **Code → Codespaces → Create codespace**. O
+ambiente já vem pronto, e a área de trabalho para o CAFES abre na porta 6080
+(aba **Ports**, senha `vscode`).
+
 ## Compilar e testar
 
 ```bash

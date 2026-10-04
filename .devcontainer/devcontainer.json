@@ -1,0 +1,14 @@
+{
+  // Ambiente do Codespaces: compila o ROSMI e abre o CAFES numa area de
+  // trabalho no navegador (porta 6080, senha "vscode").
+  "name": "ROSMI",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu-24.04",
+  "features": {
+    "ghcr.io/devcontainers/features/desktop-lite:1": {}
+  },
+  "postCreateCommand": "sudo apt-get update && sudo apt-get install -y build-essential libpng-dev default-jre",
+  "forwardPorts": [6080],
+  "portsAttributes": {
+    "6080": { "label": "desktop", "onAutoForward": "notify" }
+  }
+}
