@@ -6,7 +6,7 @@ ROSMI paralelo (C)
   threads           : 1
   OBJETOS           : 13
   soma local        : 18 (5 a mais: objetos distribuidos)
-  fase 1 (local)    : 0.006585 s   [soma dos tiles 0.007330 s, tile mais lento 0.001385 s]
-  fase 2 (bordas)   : 0.000015 s   [7 arestas, 24592 bytes, 92 unioes]
+  fase 1 (local)    : 0.012369 s   [soma dos tiles 0.012589 s, tile mais lento 0.002454 s]
+  fase 2 (bordas)   : 0.000029 s   [7 arestas, 24592 bytes, 92 unioes]
   fase 3 (reducao)  : 0.000000 s
-  TEMPO TOTAL       : 0.006600 s  [melhor das repeticoes]
+  TEMPO TOTAL       : 0.012399 s  [melhor das repeticoes]

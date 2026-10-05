@@ -1,0 +1,11 @@
+{
+  "N": 8,
+  "M": 6,
+  "K": 192,
+  "L": 512,
+  "width": 3072,
+  "height": 1536,
+  "segments": 48,
+  "ground_truth": 13,
+  "source": "imagem_trabalho.png"
+}
