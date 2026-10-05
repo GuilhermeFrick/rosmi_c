@@ -545,8 +545,9 @@ tempo por tile incha e passa a medir contenção do host, não o trabalho do til
 Na NoC alvo cada tile tem processador e memória próprios.
 
 ```bash
-python3 tools/gen_cafes.py --case data/grande_7x7 --out cafes/         --trace results/grande_7x7_p1_tiles.csv
-python3 tools/check_cafes.py cafes/grande_7x7
+python3 tools/gen_cafes.py --case reports/imagem_trabalho --out reports/cafes \
+    --trace reports/saidas/trabalho_p1_tiles.csv --host-mhz 2100
+python3 tools/check_cafes.py reports/cafes/imagem_trabalho
 ```
 
 `check_cafes.py` confere os arquivos contra a gramática que o CAFES espera —
@@ -555,28 +556,24 @@ declarados e matriz de mapeamento com as dimensões exatas da malha.
 
 ### O que o tráfego revela
 
-| Caso | Carga (ME→PA) | Bordas (PA→PA) | Total |
+Tráfego das três segmentações da imagem oficial, em phits:
+
+| Segmentação | Carga (ME→PA) | Bordas (PA→PA) | Total |
 |---|---|---|---|
-| `exemplo_2x3` | 294 912 (95,8%) | 12 288 (4,0%) | 307 896 |
-| `grande_8x6` | 2 359 296 (93,9%) | 147 456 (5,9%) | 2 512 320 |
-| `grande_7x7` | 2 408 448 (93,9%) | 150 528 (5,9%) | 2 564 660 |
+| 2 × 3 | 294 912 (95,8%) | 12 288 (4,0%) | 307 896 |
+| 4 × 6 | 294 912 (89,3%) | 33 792 (10,2%) | 330 144 |
+| 8 × 6 | 294 912 (82,9%) | 58 368 (16,4%) | 355 584 |
 
-**A troca de bordas custa cerca de 6% do tráfego; quase 94% é alimentar os tiles
-com os pixels.** A parte conceitualmente difícil do problema é barata em
-comunicação — o gargalo da arquitetura é a banda da memória para os tiles, não o
-diálogo entre vizinhos.
+**A maior parte do tráfego é alimentar os tiles com os pixels.** A parte
+conceitualmente difícil do problema, a troca de bordas, é a menor parcela da
+comunicação.
 
-Isso tem consequência direta para o item 5: segmentar mais fino **não** aumenta o
-tráfego de carga, que depende só do tamanho da imagem. Aumenta apenas a parcela
-das bordas, que é a pequena.
+Segmentar mais fino **não** aumenta o tráfego de carga, que depende só do
+tamanho da imagem. Aumenta apenas a parcela das bordas, de 4% para 16%.
 
 ### Estado
 
-Os nove arquivos (3 segmentações × 3 modelos) estão gerados e validados, e
-carregam na ferramenta. O CAFES acompanha o repositório, em
+Os modelos das três segmentações e a exploração completa no CAFES (CWM, ACPM e
+CDCM, com prints e resultados) estão em
+[`reports/`](../reports/README.md). O CAFES acompanha o repositório, em
 `third_party/cafes/`, e abre com `tools/cafes.sh`.
-
-O exemplo do enunciado, com a imagem oficial, já foi avaliado no modelo CWM:
-o passo a passo completo, da linha de comando ao resultado no CAFES, está em
-[`reports/`](../reports/README.md). **A avaliação das três segmentações nos
-modelos CWM, ACPM e CDCM ainda não foi feita.**

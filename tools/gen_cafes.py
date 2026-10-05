@@ -31,9 +31,9 @@ Fases:
   4  PC  -> PAs           resultado global
 
 Uso:
-  python3 tools/gen_cafes.py --case data/grande_7x7 --out cafes/
-  python3 tools/gen_cafes.py --case data/grande_7x7 --out cafes/ \\
-          --trace results/grande_7x7_p8_tiles.csv
+  python3 tools/gen_cafes.py --case reports/imagem_trabalho --out reports/cafes
+  python3 tools/gen_cafes.py --case reports/imagem_trabalho --out reports/cafes \\
+          --trace reports/saidas/trabalho_p1_tiles.csv --host-mhz 2100
 """
 
 import argparse
@@ -104,7 +104,7 @@ def load_trace(path):
 class App:
     """Descricao da aplicacao, independente do formato de saida."""
 
-    def __init__(self, N, M, K, L, phit_bits, trace, freq_hz, cycles_per_pixel,
+    def __init__(self, N, M, K, L, phit_bits, trace, host_hz, cycles_per_pixel,
                  writeback):
         self.N, self.M, self.K, self.L = N, M, K, L
         self.S = N * M
@@ -114,14 +114,16 @@ class App:
         self.cores = ["ME"] + [f"PA{s}" for s in range(self.S)] + ["PC"]
 
         # --- custo de computacao por tile, em ciclos -----------------------
-        # Com traco: converte o tempo medido para ciclos na frequencia alvo.
-        # Sem traco: usa um modelo analitico de ciclos por pixel. Os dois
-        # caminhos produzem a mesma ordem de grandeza; o traco so torna o
-        # desbalanceamento entre tiles realista.
+        # Com traco: tempo medido x frequencia do processador onde ele foi
+        # medido = ciclos que a rotulacao realmente gastou. O tile executa
+        # esses mesmos ciclos na frequencia da NoC; usar a frequencia da NoC
+        # na conversao suporia um tile tao rapido quanto o computador de
+        # medicao. Sem traco: modelo analitico de ciclos por pixel. O traco
+        # so acrescenta o desbalanceamento real entre tiles.
         self.cycles = {}
         for s in range(self.S):
             if trace and s in trace:
-                self.cycles[s] = max(1, round(trace[s]["tempo_s"] * freq_hz))
+                self.cycles[s] = max(1, round(trace[s]["tempo_s"] * host_hz))
             else:
                 self.cycles[s] = max(1, round(cycles_per_pixel * K * L))
 
@@ -213,8 +215,8 @@ class App:
         que o desenho da aplicacao tenha a forma da imagem. ME e PC ficam nas
         laterais, fora da grade, porque falam com todos.
         """
-        step_x = 170
-        step_y = 150
+        step_x = 200
+        step_y = 260
         margin = 90
 
         xy = {}
@@ -231,18 +233,15 @@ class App:
     def mapping(self, rows, cols):
         """Mapeamento natural: PAs no tile do seu proprio segmento.
 
-        So faz sentido emitir quando nucleos e tiles se equivalem em numero: o
-        formato do CAFES nao tem um token para "tile vazio" -- qualquer palavra
-        na matriz vira um nucleo. Com sobra de tiles, omitimos a secao e
-        deixamos o proprio CAFES fazer o mapeamento, que e justamente uma das
-        explorações pedidas.
+        A malha precisa conter o bloco N x M de segmentos sem deformar a
+        vizinhanca, e ter pelo menos dois tiles livres para ME e PC. O formato
+        do CAFES nao tem um token para "tile vazio" -- qualquer palavra na
+        matriz vira um nucleo --, entao os tiles que sobram recebem nucleos
+        VZ0, VZ1, ..., que nao enviam nem recebem mensagens.
         """
-        # Tres condicoes, todas necessarias: a malha precisa conter o bloco
-        # N x M de segmentos sem deformar a vizinhanca, sobrar exatamente os
-        # dois tiles de ME e PC, e nao deixar nenhum tile sem nucleo.
         if rows < self.N or cols < self.M:
             return None
-        if rows * cols != self.S + 2:
+        if rows * cols < self.S + 2:
             return None
         grid = [[None] * cols for _ in range(rows)]
         for r in range(self.N):
@@ -250,7 +249,7 @@ class App:
                 grid[r][c] = f"PA{self.seg(r, c)}"
         livres = [(r, c) for r in range(rows) for c in range(cols)
                   if grid[r][c] is None]
-        if len(livres) != 2:
+        if len(livres) < 2:
             return None
         # ME e PC nos tiles livres mais centrais, para encurtar o caminho medio
         cy, cx = (rows - 1) / 2.0, (cols - 1) / 2.0
@@ -258,10 +257,8 @@ class App:
         (r1, c1), (r2, c2) = livres[0], livres[1]
         grid[r1][c1] = "ME"
         grid[r2][c2] = "PC"
-        for r in range(rows):
-            for c in range(cols):
-                if grid[r][c] is None:
-                    return None   # sobrou tile: nao da para descrever
+        for k, (r, c) in enumerate(livres[2:]):
+            grid[r][c] = f"VZ{k}"
         return grid
 
 
@@ -294,6 +291,29 @@ def write_cwg(app, rows, cols, path):
                 f.write(" " + " ".join(row) + "\n")
 
 
+# Desenho do ACPM e do CDCM na interface do CAFES. Cada mensagem e um circulo
+# de 60 de diametro; os passos abaixo deixam folga entre eles e espaco para as
+# setas entre fases. As mensagens de uma fase ficam em linha, ao lado da tag
+# (ACPM) ou na faixa da fase (CDCM), e a linha quebra a cada DRAW_PER_ROW
+# mensagens, para caber na area visivel da janela.
+DRAW_X0 = 60
+DRAW_Y0 = 60
+DRAW_STEP_X = 95
+DRAW_STEP = 85
+DRAW_PER_ROW = 9
+
+
+def draw_rows(n):
+    """Quantas linhas de desenho ocupam n mensagens."""
+    return max(1, -(-n // DRAW_PER_ROW))
+
+
+def draw_cell(k, y0):
+    """Posicao da k-esima mensagem de uma fase que comeca na altura y0."""
+    return (DRAW_X0 + DRAW_STEP_X * (1 + (k % DRAW_PER_ROW)),
+            y0 + DRAW_STEP * (k // DRAW_PER_ROW))
+
+
 def write_acpg(app, rows, cols, path):
     """ACPM: o mesmo grafo, com as arestas agrupadas por fase."""
     edges = app.edges()
@@ -302,27 +322,65 @@ def write_acpg(app, rows, cols, path):
     with open(path, "w") as f:
         f.write("#_NoC_Size (lines columns)\n %d %d\n\n" % (rows, cols))
         f.write("#_ACPG_TagsGraphic (list of: Tag x y)\n")
-        f.write(" START 50 50\n")
-        y = 125
+        f.write(" START %d %d\n" % (DRAW_X0, DRAW_Y0))
+        y = DRAW_Y0 + DRAW_STEP
         for t in tags:
             xy_tag_y[t] = y
-            f.write(" %d 50 %d\n" % (t, y))
-            y += 75
-        f.write(" END 50 %d\n" % y)
+            f.write(" %d %d %d\n" % (t, DRAW_X0, y))
+            n = sum(1 for e in edges if e[0] == t)
+            y += DRAW_STEP * draw_rows(n)
+        f.write(" END %d %d\n" % (DRAW_X0, y))
         f.write("\n#_ACPG_VerticesGraphic (list of: vertices --> Tag "
                 "sourceCore - targetCore phits (x y)\n")
         for t in tags:
-            yy = xy_tag_y[t]
-            for (tag, src, dst, ph, _) in edges:
-                if tag != t:
-                    continue
-                f.write(" %d\t%s - %s\t%d\t: %d\t%d\n" % (t, src, dst, ph, 150, yy))
-                yy += 20
+            msgs = [e for e in edges if e[0] == t]
+            for k, (tag, src, dst, ph, _) in enumerate(msgs):
+                x, yy = draw_cell(k, xy_tag_y[t])
+                f.write(" %d\t%s - %s\t%d\t: %d\t%d\n" % (t, src, dst, ph, x, yy))
         grid = app.mapping(rows, cols)
         if grid:
             f.write("\n#_ACPG2NoC_Mapping (matrix of: cores)\n")
             for row in grid:
                 f.write(" " + " ".join(row) + "\n")
+
+
+def cdcg_predecessors(edges):
+    """Dependencias entre as mensagens, segundo o que cada nucleo precisa.
+
+    Devolve, para cada mensagem, a lista das mensagens de que ela depende
+    (vazia = depende so do START):
+
+      - ME -> PA: nenhuma; a ordem das cargas fica por conta da porta do ME;
+      - primeira mensagem de um PA: so a carga do seu segmento. E ela que leva
+        a computacao da rotulacao local, que comeca assim que o segmento chega;
+      - mensagens seguintes de um PA: a mensagem anterior do mesmo PA e, no
+        envio ao PC, as bordas que ele recebeu dos vizinhos;
+      - PC -> PA: todas as mensagens PA -> PC.
+
+    Um PA sem vizinho a leste nem ao sul so envia ao PC; esse envio nao espera
+    as bordas recebidas, que chegam antes porque o PA e o ultimo a ser carregado
+    na sua linha e coluna.
+    """
+    preds = [[] for _ in edges]
+    load, last_sent = {}, {}
+    to_pc = []
+    for i, (tag, src, dst, _, _) in enumerate(edges):
+        if src == "ME":
+            load[dst] = i
+        elif src.startswith("PA"):
+            if src not in last_sent:
+                preds[i] = [load[src]]
+            else:
+                preds[i] = [last_sent[src]]
+                if dst == "PC":
+                    preds[i] += [j for j, e in enumerate(edges)
+                                 if e[2] == src and e[1].startswith("PA")]
+            last_sent[src] = i
+            if dst == "PC":
+                to_pc.append(i)
+        elif src == "PC":
+            preds[i] = list(to_pc)
+    return preds
 
 
 def write_cdcg(app, rows, cols, path):
@@ -336,31 +394,28 @@ def write_cdcg(app, rows, cols, path):
     with open(path, "w") as f:
         f.write("#_NoC_Size (lines columns)\n %d %d\n\n" % (rows, cols))
         f.write("#_CDCG_Graphic (list of: IDCore x y)\n")
-        f.write(" START 50 50\n END 50 %d\n" % (120 + 30 * len(phases) + 30))
-        y = 120
+        y_end = DRAW_Y0 + DRAW_STEP * (1 + sum(draw_rows(len(by_phase[p])) for p in phases))
+        f.write(" START %d %d\n END %d %d\n" % (DRAW_X0, DRAW_Y0, DRAW_X0, y_end))
+        y = DRAW_Y0 + DRAW_STEP
         for p in phases:
-            x = 50
-            for i in by_phase[p]:
-                f.write(" %d %d %d\n" % (i, x, y))
-                x += 70
-                if x > 700:
-                    x = 50
-                    y += 25
-            y += 30
+            for k, i in enumerate(by_phase[p]):
+                x, yy = draw_cell(k, y)
+                f.write(" %d %d %d\n" % (i, x, yy))
+            y += DRAW_STEP * draw_rows(len(by_phase[p]))
         f.write("\n#_CDCG_Vertices (list of: vertices --> IDCore sourceCore - "
                 "targetCore phits : computation)\n")
         for i, (tag, src, dst, ph, cyc) in enumerate(edges):
             f.write(" %d %s - %s %d : %d\n" % (i, src, dst, ph, cyc))
+        preds = cdcg_predecessors(edges)
+        succ = [[] for _ in edges]
+        for i, ps in enumerate(preds):
+            for j in ps:
+                succ[j].append(i)
         f.write("\n#_CDCG_Edges (list of: dependent vertices)\n")
-        f.write(" START " + " ".join(str(i) for i in by_phase[phases[0]]) + "\n")
+        f.write(" START " + " ".join(str(i) for i, ps in enumerate(preds) if not ps) + "\n")
         f.write(" END\n")
-        for pi, p in enumerate(phases):
-            nxt = by_phase[phases[pi + 1]] if pi + 1 < len(phases) else None
-            for i in by_phase[p]:
-                if nxt is None:
-                    f.write(" %d END\n" % i)
-                else:
-                    f.write(" %d %s\n" % (i, " ".join(str(j) for j in nxt)))
+        for i in range(len(edges)):
+            f.write(" %d %s\n" % (i, " ".join(str(j) for j in succ[i]) if succ[i] else "END"))
         grid = app.mapping(rows, cols)
         if grid:
             f.write(" #_CDCG2NoC_Mapping (matrix of: cores)\n")
@@ -375,8 +430,9 @@ def main():
     ap.add_argument("--trace", default=None,
                     help="CSV *_tiles.csv de rosmi_par --trace (opcional)")
     ap.add_argument("--phit-bits", type=int, default=DEFAULT_PHIT_BITS)
-    ap.add_argument("--freq-mhz", type=float, default=100.0,
-                    help="frequencia alvo para converter tempo em ciclos")
+    ap.add_argument("--host-mhz", type=float, default=None,
+                    help="frequencia do processador onde o traco foi medido "
+                         "(obrigatoria com --trace)")
     ap.add_argument("--cycles-per-pixel", type=float, default=8.0,
                     help="custo por pixel quando nao ha traco medido")
     ap.add_argument("--noc", default=None, help="forca o tamanho da NoC, ex 8x7")
@@ -388,7 +444,10 @@ def main():
     N, M, K, L = meta["N"], meta["M"], meta["K"], meta["L"]
 
     trace = load_trace(args.trace)
-    app = App(N, M, K, L, args.phit_bits, trace, args.freq_mhz * 1e6,
+    if trace and not args.host_mhz:
+        raise SystemExit("erro: --trace exige --host-mhz (frequencia do "
+                         "processador onde o traco foi medido)")
+    app = App(N, M, K, L, args.phit_bits, trace, (args.host_mhz or 0) * 1e6,
               args.cycles_per_pixel, args.writeback)
 
     prefer = None

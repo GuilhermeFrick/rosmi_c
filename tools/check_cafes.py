@@ -18,7 +18,7 @@ O que e conferido, nos tres formatos:
     tile vazio, entao qualquer palavra na matriz vira um nucleo.
 
 Uso:
-  python3 tools/check_cafes.py cafes/grande_7x7
+  python3 tools/check_cafes.py reports/cafes/imagem_trabalho
 """
 
 import sys
@@ -73,7 +73,8 @@ def check_mapping(sections, key, rows, cols, cores, problems):
     placed = [name for row in grid for name in row]
     if len(placed) != len(set(placed)):
         fail(problems, f"{key}: ha nucleo repetido na matriz")
-    unknown = sorted(set(placed) - cores)
+    # VZ0, VZ1, ... marcam tiles vazios: o formato nao tem token para isso
+    unknown = sorted(n for n in set(placed) - cores if not n.startswith("VZ"))
     if unknown:
         fail(problems, f"{key}: nomes que nao sao nucleos declarados: {unknown}")
     missing = sorted(cores - set(placed))

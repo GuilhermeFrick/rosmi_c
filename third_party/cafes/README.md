@@ -32,3 +32,11 @@ resultados em [`reports/`](../../reports/).
   (`src/cafes/model/CWM/CWM_GrafoFormatoTextual.java`, linha 273, usa o número
   de camadas da NoC como índice da camada). Os algoritmos de busca (Exhaustive,
   Simulated Annealing, Taboo) não são afetados, nem os modelos ACPM e CDCM.
+- **As opções "with timing estimation" do CWM falham numa NoC 2D**, com
+  `ArrayIndexOutOfBoundsException`. Em `CWM_AnaliseTemporal.java`, a função
+  `roteador()` declara os parâmetros na ordem `(linha, altura, coluna)`, mas
+  quase todas as chamadas passam `(linha, coluna, altura)`. Use o ACPM ou o
+  CDCM para estimar o tempo.
+- **O CDCM grava `Energy.txt` e `Latency.txt`** na pasta de onde o CAFES foi
+  aberto, com a energia e a latência do último mapeamento. Os dois estão no
+  `.gitignore`.

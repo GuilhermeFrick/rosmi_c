@@ -1,0 +1,12 @@
+$ bin/rosmi_par reports/imagem_trabalho.png --N 4 --M 6 --conn 8 --threads 1 --reps 8 --trace reports/saidas/trabalho_4x6_p1
+ROSMI paralelo (C)
+  imagem            : reports/imagem_trabalho.png (1536 x 3072 px)
+  segmentacao       : N=4 x M=6 = 24 segmentos de K=384 x L=512
+  conectividade     : 8
+  threads           : 1
+  OBJETOS           : 13
+  soma local        : 27 (14 a mais: objetos distribuidos)
+  fase 1 (local)    : 0.012993 s   [soma dos tiles 0.015296 s, tile mais lento 0.000911 s]
+  fase 2 (bordas)   : 0.000079 s   [38 arestas, 67704 bytes, 294 unioes]
+  fase 3 (reducao)  : 0.000000 s
+  TEMPO TOTAL       : 0.013073 s  [melhor das repeticoes]
