@@ -84,8 +84,7 @@ src/            código C (um módulo por arquivo)
 test/           testes unitários
 data/           imagens de teste com resposta conhecida
 docs/           enunciado, imagem oficial, diagramas e fundamentos
-reports/        exemplo do enunciado passo a passo
-cafes/          modelos do CAFES das três segmentações
+reports/        exemplo do enunciado passo a passo e modelos do CAFES
 tools/          scripts auxiliares (geração de imagens, modelos, cafes.sh)
 third_party/    o CAFES
 ```
