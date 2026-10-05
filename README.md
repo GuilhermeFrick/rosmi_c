@@ -95,5 +95,5 @@ third_party/    o CAFES
   arquitetura do código, a validação e o desempenho.
 - [`reports/README.md`](reports/README.md): o exemplo do enunciado, da linha de
   comando ao resultado no CAFES.
-- [`third_party/cafes/README.md`](third_party/cafes/README.md): o CAFES e os
-  seus problemas conhecidos.
+- [`third_party/cafes/README.md`](third_party/cafes/README.md): o CAFES, a
+  versão incluída e como abri-lo.

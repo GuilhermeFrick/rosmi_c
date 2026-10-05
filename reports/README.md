@@ -464,9 +464,8 @@ Exhaustive Search Mapping Algorithm**.
 ![menu Tools](prints/cafes_06_menu_tools.png)
 
 > **Não use "Compute Mapping" (em laranja) no CWM.** Um bug do CAFES na leitura
-> do `.CWG` faz essa opção travar em "Computing..." numa NoC 2D (detalhes em
-> [`third_party/cafes/README.md`](../third_party/cafes/README.md)). Os
-> algoritmos de busca não são afetados.
+> do `.CWG` faz essa opção travar em "Computing..." numa NoC 2D. Os algoritmos
+> de busca não são afetados.
 
 Com 8 núcleos, a busca exaustiva termina em poucos segundos.
 

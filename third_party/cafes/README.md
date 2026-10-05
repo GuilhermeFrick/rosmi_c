@@ -22,21 +22,3 @@ tools/cafes.sh
 O `cafes.jar` foi montado a partir da pasta `class/` da distribuição recebida,
 sem nenhuma alteração no código. É a mesma versão usada para gerar os
 resultados em [`reports/`](../../reports/).
-
-## Problemas conhecidos
-
-- **O `bin/cafes.sh` original não abre o programa:** ele procura as classes
-  em `bin/`, mas elas ficam em `class/`. Use o `tools/cafes.sh`.
-- **"Compute Mapping" trava no modelo CWM numa NoC 2D.** O leitor do `.CWG`
-  grava o mapeamento do arquivo na camada errada
-  (`src/cafes/model/CWM/CWM_GrafoFormatoTextual.java`, linha 273, usa o número
-  de camadas da NoC como índice da camada). Os algoritmos de busca (Exhaustive,
-  Simulated Annealing, Taboo) não são afetados, nem os modelos ACPM e CDCM.
-- **As opções "with timing estimation" do CWM falham numa NoC 2D**, com
-  `ArrayIndexOutOfBoundsException`. Em `CWM_AnaliseTemporal.java`, a função
-  `roteador()` declara os parâmetros na ordem `(linha, altura, coluna)`, mas
-  quase todas as chamadas passam `(linha, coluna, altura)`. Use o ACPM ou o
-  CDCM para estimar o tempo.
-- **O CDCM grava `Energy.txt` e `Latency.txt`** na pasta de onde o CAFES foi
-  aberto, com a energia e a latência do último mapeamento. Os dois estão no
-  `.gitignore`.
