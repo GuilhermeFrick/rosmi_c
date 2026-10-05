@@ -20,3 +20,7 @@ results/
 # Python
 __pycache__/
 *.pyc
+
+# Gravados pelo CAFES (modelo CDCM) na pasta de onde ele foi aberto
+Energy.txt
+Latency.txt
